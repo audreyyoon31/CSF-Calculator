@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCSA CSF Spring '25  Member Application Elgibility Calculator</title>
+    <h1>OCSA CSF Spring '25 Member Application Elgibility Calculator</h1>
+    <h2>Note: This is not the application. This will just check if you qualify for CSF.</h2>
+    <subtitle>If you believe there is a bug, please email <a href="mailto:micah.lai@ocsarts.net">micah.lai@ocsarts.net</a></subtitle>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .dropdown-row {
+            display: flex;
+            justify-content: space-between;
+        }
+        .form-group {
+            flex: 1;
+            margin-right: 15px;
+        }
+        label {
+            margin-right: 10px;
+        }
+        button {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form id="myForm">
+            <div class="dropdown-row">
+                <div class="form-group">
+                    <label for="courseDropdown1">Course 1:</label>
+                    <select id="courseDropdown1"></select>
+                </div>
+                <div class="form-group">
+                    <label for="gradeDropdown1">Grade 1:</label>
+                    <select id="gradeDropdown1"></select>
+                </div>
+            </div>
+
+            <div class="dropdown-row">
+                <div class="form-group">
+                    <label for="courseDropdown2">Course 2:</label>
+                    <select id="courseDropdown2"></select>
+                </div>
+                <div class="form-group">
+                    <label for="gradeDropdown2">Grade 2:</label>
+                    <select id="gradeDropdown2"></select>
+                </div>
+            </div>
+
+            <div class="dropdown-row">
+                <div class="form-group">
+                    <label for="courseDropdown3">Course 3:</label>
+                    <select id="courseDropdown3"></select>
+                </div>
+                <div class="form-group">
+                    <label for="gradeDropdown3">Grade 3:</label>
+                    <select id="gradeDropdown3"></select>
+                </div>
+            </div>
+
+            <div class="dropdown-row">
+                <div class="form-group">
+                    <label for="courseDropdown4">Course 4:</label>
+                    <select id="courseDropdown4"></select>
+                </div>
+                <div class="form-group">
+                    <label for="gradeDropdown4">Grade 4:</label>
+                    <select id="gradeDropdown4"></select>
+                </div>
+            </div>
+
+            <div class="dropdown-row">
+                <div class="form-group">
+                    <label for="courseDropdown5">Course 5:</label>
+                    <select id="courseDropdown5"></select>
+                </div>
+                <div class="form-group">
+                    <label for="gradeDropdown5">Grade 5:</label>
+                    <select id="gradeDropdown5"></select>
+                </div>
+            </div>
+
+            <div class="dropdown-row">
+                <div class="form-group">
+                    <label for="courseDropdown6">Course 6:</label>
+                    <select id="courseDropdown6"></select>
+                </div>
+                <div class="form-group">
+                    <label for="gradeDropdown6">Grade 6:</label>
+                    <select id="gradeDropdown6"></select>
+                </div>
+            </div>
+
+            <button type="button" onclick="handleSubmit()">Submit</button>
+            
+        </form>
+
+        <p id="result"></p>
+    </div>
+
+    <script>
+        // Parse CSV data and return a dictionary
+        function parseCSVToDictionary(data) {
+            const rows = data.split('\n').map(row => row.split(','));
+            const headers = rows[0];  // Extract header row (column names)
+            const dictionary = [];
+
+            rows.slice(1).forEach((row) => {
+                const entry = {};
+                headers.forEach((header, index) => {
+                    entry[header.trim()] = row[index].trim();  // Map column headers to row data
+                });
+                dictionary.push(entry);
+            });
+
+            return dictionary;
+        }
+
+        // Populate course dropdowns using CSV data stored in a dictionary
+        function initializeCourseDropdowns(csvDict) {
+            const courseDropdowns = [
+                document.getElementById('courseDropdown1'),
+                document.getElementById('courseDropdown2'),
+                document.getElementById('courseDropdown3'),
+                document.getElementById('courseDropdown4'),
+                document.getElementById('courseDropdown5'),
+                document.getElementById('courseDropdown6')
+                // Add more dropdowns as needed
+            ];
+
+            courseDropdowns.forEach(dropdown => {
+                csvDict.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course['Course'];
+                    option.text = course['Course'];
+                    dropdown.appendChild(option);
+                });
+            });
+        }
+
+        // Populate grade dropdowns with fixed options (A, B, C, D, F)
+        function initializeGradeDropdowns() {
+            const gradeOptions = ['A', 'B', 'C', 'D', 'F'];
+            const gradeDropdowns = [
+                document.getElementById('gradeDropdown1'),
+                document.getElementById('gradeDropdown2'),
+                document.getElementById('gradeDropdown3'),
+                document.getElementById('gradeDropdown4'),
+                document.getElementById('gradeDropdown5'),
+                document.getElementById('gradeDropdown6')
+                // Add more dropdowns as needed
+            ];
+
+            gradeDropdowns.forEach(dropdown => {
+                gradeOptions.forEach(grade => {
+                    const option = document.createElement('option');
+                    option.value = grade;
+                    option.text = grade;
+                    dropdown.appendChild(option);
+                });
+            });
+        }
+
+        // Fetch CSV file and initialize dropdowns
+        async function fetchAndInitialize() {
+            console.log("This is v67")
+
+            const response = await fetch('courses.csv');  // Assuming 'data.csv' is in the same directory
+            const data = await response.text();
+            const csvDict = parseCSVToDictionary(data);  // Convert CSV to dictionary
+            
+            courseData = csvDict;
+
+            initializeCourseDropdowns(csvDict);
+            initializeGradeDropdowns();
+        }
+
+
+        // Handle form submission and display the selected values
+        function handleSubmit() {
+            const courseDropdowns = [
+                document.getElementById('courseDropdown1').value,
+                document.getElementById('courseDropdown2').value,
+                document.getElementById('courseDropdown3').value,
+                document.getElementById('courseDropdown4').value,
+                document.getElementById('courseDropdown5').value,
+                document.getElementById('courseDropdown6').value
+                // Add more as needed
+            ];
+
+            const gradeDropdowns = [
+                document.getElementById('gradeDropdown1').value,
+                document.getElementById('gradeDropdown2').value,
+                document.getElementById('gradeDropdown3').value,
+                document.getElementById('gradeDropdown4').value,
+                document.getElementById('gradeDropdown5').value,
+                document.getElementById('gradeDropdown6').value
+                // Add more as needed
+            ];
+            
+            //const { qualificationStatus, grades, type, honors } = checkQualification(courseDropdowns, gradeDropdowns);
+
+            //let result = 'Selected Courses and Grades: \n';
+            /* 
+            courseDropdowns.forEach((course, index) => {
+                result += `Course ${index + 1}: ${course}, Grade: ${gradeDropdowns[index]}\n`;
+            }); */
+
+            let result = checkQualification(courseDropdowns, gradeDropdowns)
+
+            //console.log(courseData)
+
+            document.getElementById('result').innerText = result;
+        }
+
+        function checkQualification(courses, grades) {
+            // Check if any grade is 'D' or 'F'
+            if(hasDuplicates(courses)){
+                return "Duplicate courses entered"
+            }
+
+            if (grades.some(grade => grade === 'D' || grade === 'F')) {
+                return "You do not qualify";
+            }
+            
+            
+            // Initialize the lists and variables
+            let types = [];
+            let honors = [];
+            
+            // Points mapping
+            const gradePoints = { 'A': 3, 'B': 1, 'C': 0 };
+
+            // Array to keep track of points for each course
+            let coursePoints = [];
+            
+            // Iterate through courses to populate types, honors, and calculate points
+            courses.forEach((course, index) => {
+                // Find the course in the csvDict
+                let courseInfo = courseData.find(item => item["Course"] === course);
+                
+                // If course is found, extract Type, Honors and calculate points
+                if (courseInfo) {
+                    types.push(courseInfo["List"]);
+                    const isHonors = courseInfo["Weighted"] === "TRUE";
+                    honors.push(isHonors);
+                    
+                    // Calculate the points for the current grade
+                    const points = gradePoints[grades[index]] || 0;
+                    coursePoints.push({ index, points, list: courseInfo["List"], isHonors, isTHEHonors:false});
+                    
+                } else {
+                    // If the course is not found, add default values
+                    types.push(undefined);
+                    honors.push(false);
+                    
+                    const points = gradePoints[grades[index]] || 0;
+                    coursePoints.push({ index, points, list: undefined, isHonors: false, isTHEHonors:false });
+                    
+                    totalPoints += points;
+                    console.log("Can't Find course")
+                }
+            });
+
+            let finalResult = getQualificationAfterRestriction(coursePoints)
+            
+
+            if (finalResult == "no qual") {
+                return `You do not qualify`;
+            }
+            console.log(finalResult);
+            let aListCP = "";
+            let bListCP = "";
+            let cListCP = "";
+
+            let totalPoints = 0;
+            finalResult.forEach((finalResultCourse,index) => {
+                console.log(finalResultCourse.list)
+                let pointValue = finalResultCourse.points
+                if(finalResultCourse.isTHEHonors){
+                    pointValue += 1;
+                }
+
+                if(finalResultCourse.list === "a"){
+                    aListCP += `${courses[finalResultCourse.index]} / ${grades[finalResultCourse.index]} / ${pointValue}, `
+                }
+                if(finalResultCourse.list === "b"){
+                    bListCP += `${courses[finalResultCourse.index]} / ${grades[finalResultCourse.index]} / ${pointValue}, `
+                }
+                if(finalResultCourse.list === "c"){
+                    cListCP += `${courses[finalResultCourse.index]} / ${grades[finalResultCourse.index]} / ${pointValue}, `
+                }
+                totalPoints += pointValue;
+                
+            });
+
+            if(bListCP == ""){
+                bListCP = "n/a"
+            }
+            if(cListCP == ""){
+                cListCP = "n/a"
+            }
+            
+            //console.log(coursePoints)
+            
+
+            return `You qualify for CSF with ${totalPoints} points!\nCopy and paste below:\nA List Items: ${aListCP}\nB List Items: ${bListCP}\nC List Items: ${cListCP}`;
+        }
+        function getQualificationAfterRestriction(coursePoints){
+            
+            
+            for (let i = 0; i < coursePoints.length; i++) {
+                
+
+                let removeCourse = coursePoints.filter(function(e) { return e !== coursePoints[i]})
+
+                removeCourse.sort(function(first, second) {
+                    return first.list.charCodeAt(0) - second.list.charCodeAt(0);
+                });
+
+                let totalPoints = 0;
+                let typeACount = 0;
+                let typeABCount = 0;
+
+                let addedHonors = 0;
+                console.log(removeCourse)
+                removeCourse.forEach((rm,index) => {
+                    let addForHonors = false;
+                    if(addedHonors < 2 && rm.isHonors){
+                        addedHonors += 1;
+                        addForHonors = true;
+                    }
+                    if(rm.list == 'a'){
+                        typeACount += rm.points;
+                        typeABCount += rm.points;
+                        if(addForHonors){
+                            typeACount += 1;
+                            typeABCount += 1;
+                        }
+                    }else if(rm.list == 'b'){
+                        typeABCount += rm.points;
+                        if(addForHonors){
+                            typeABCount += 1;
+                        }
+                    }
+                    
+                    totalPoints += rm.points;
+                        if(addForHonors){
+                            totalPoints += 1;
+                            removeCourse[index].isTHEHonors = true;
+                            console.log(index)
+                            console.log(removeCourse[index])
+                        }
+                });
+                console.log(coursePoints[i])
+                console.log(removeCourse)
+                console.log(`${typeACount}, ${typeABCount}, ${totalPoints}`)
+
+                if (typeACount >= 4 && typeABCount >= 7 && totalPoints >= 10) {
+                    console.log("Qualify")
+                    return removeCourse;
+                }
+                
+            }
+            return "no qual"
+            
+        }
+
+
+        function hasDuplicates(arr) {
+            var counts = [];
+
+            for (var i = 0; i <= arr.length; i++) {
+                if (counts[arr[i]] === undefined) {
+                    counts[arr[i]] = 1;
+                } else {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        // Initialize dropdowns when the page loads
+        document.addEventListener('DOMContentLoaded', fetchAndInitialize);
+    </script>
+</body>
+</html>
